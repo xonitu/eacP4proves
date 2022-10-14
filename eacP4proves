@@ -1,0 +1,262 @@
+package eac4p222231s;
+
+import java.util.Scanner;
+
+public class EAC4P222231S2 {
+
+	static final int ID_USUARI = 0;
+	static final int ID_DNI = 1;
+	static final int ID_DATA_ALTA = 2;
+	static final int ID_DATA_BAIXA = 3;
+	static final int REG_INEXISTENT = -1;
+	Scanner lector = new Scanner(System.in);
+
+	public static void main(String[] args) {
+		EAC4P222231S2 prg = new EAC4P222231S2();
+		prg.inici();
+	}
+
+	void inici() {
+		String[][] registre = {
+				// usuari NIF DATA_ALTA DATA_BAIXA
+				{ "rgalvez", "44821635K", "02/01/2020", "" }, { "jpuig", "11222333A", "10/02/2020", "10/05/2020" },
+				{ "rsoto", "46821635K", "15/02/2020", "15/05/2020" },
+				{ "agarcia", "43821635K", "20/02/2020", "20/02/2021" },
+				{ "fgarcia", "34985423A", "25/03/2020", "25/09/2020" }, { "rsoto", "45821635K", "01/04/2021", "" },
+				{ "jpuig", "11222333A", "15/04/2021", "" }, { "ralonso", "22333444B", "10/05/2021", "" },
+				{ "fgarcia", "34985423A", "01/06/2021", "30/09/2021" },
+				{ "efuster", "33444555C", "08/06/2021", "08/10/2021" },
+				{ "sfont", "44555666D", "10/06/2021", "10/11/2021" }, { "msoler", "55666777E", "15/06/2021", "" },
+				{ "efuster", "33444555C", "01/02/2022", "" }, { "sferrer", "66777888F", "10/02/2022", "" },
+				{ "jcasas", "77888999G", "01/03/2022", "" }, { "", "", "", "" }, { "", "", "", "" }, { "", "", "", "" },
+				{ "", "", "", "" }, { "", "", "", "" }, { "", "", "", "" } };
+
+		boolean calSortir = false;
+		char opcio;
+		do {
+			System.out.println("");
+			System.out.println("1. Reactivar un usuari");
+			System.out.println("2. Donar de baixa un usuari");
+			System.out.println("3. Mostrar registre");
+			System.out.println("0. Sortir de l'aplicacio");
+			opcio = demanarOpcioMenu();
+			switch (opcio) {
+			case '1':
+				reactivarUsuariDeBaixa(registre);
+				break;
+			case '2':
+				donarDeBaixa(registre);
+				break;
+			case '3':
+				mostrarRegistre(registre);
+				break;
+			case '0':
+				calSortir = true;
+			}
+		} while (!calSortir);
+	}
+
+	char demanarOpcioMenu() {
+		String resp;
+		System.out.print("Esculliu una opcio (1,2,3 o 0) i premeu [ENTRAR]: ");
+		resp = lector.nextLine();
+		if (resp.isEmpty()) {
+			resp = " ";
+		}
+		return resp.charAt(0);
+	}
+
+	/**
+	 * MÃ¨tode que realitza l'assignacio d'un dispositiu a una persona
+	 *
+	 * @param registre
+	 */
+	// REACTIVAR USUARI
+	void reactivarUsuariDeBaixa(String[][] registre) {
+		boolean trobat = false;
+
+		System.out.println("Fica DNI que vulguis reactivar");
+		String ficoDni = lector.nextLine();
+
+		int posicio = obtenirFilaPerDniUsuariActiu(registre, ficoDni);
+
+		if (posicio != REG_INEXISTENT) {
+			System.out.println(
+					"Aquest usuari, " + registre[posicio][ID_USUARI] + ", esta actiu a la posicio; " + posicio);
+			return;
+		} else {
+			posicio = obtenirFilaPerDniDonatBaixa(registre, ficoDni);
+
+		}
+		if (posicio == REG_INEXISTENT) {
+			System.out.println("No existeix");
+
+			return;
+		}
+		int posicioBuida = trobaBuit(registre);
+		if (posicioBuida != REG_INEXISTENT && registre[20][ID_DNI] == "") {
+
+			System.out.println("Introdueix nova data alta;");
+			String novaDataAlta = lector.nextLine();
+
+			registre[posicioBuida][ID_USUARI] = registre[posicio][ID_USUARI];
+			registre[posicioBuida][ID_DNI] = registre[posicio][ID_DNI];
+			registre[posicioBuida][ID_DATA_ALTA] = novaDataAlta;
+			registre[posicioBuida][ID_DATA_BAIXA] = "";
+
+			System.out.println("_________________________________________");
+			System.out.println("REGISTRE ACTUALITZAT;");
+			System.out.println("Usuari\tDni\t\tAlta\t\tBaixa");
+			System.out.println("\n" + registre[posicio][ID_USUARI] + "\t" + registre[posicio][ID_DNI] + "\t"
+					+ novaDataAlta + "\t" + registre[posicioBuida][ID_DATA_BAIXA]);
+
+		}
+		if (registre[20][ID_DNI] != "") {
+
+			System.out.println("No hi ha espai per a mes files");
+			trobat = true;
+			lector.nextLine();
+			return;
+		}
+	}
+
+//TROBA LA PRIMERA FILA TOTALMENT BUIDA PER AFEGIR USERS
+	int trobaBuit(String[][] registre) {
+		int position = 0;
+		boolean found = false;
+		while (position < registre.length && !found) {
+			if (registre[position][ID_DNI].isEmpty()) {
+				found = true;
+
+			} else {
+				position++;
+			}
+		}
+		return found ? position : -1;
+	}
+
+	/**
+	 * * MÃ¨tode que realitza la cancelÂ·laciÃ³ de l'assignaciÃ³ d'un dispositiu a una
+	 * personarva
+	 *
+	 * @param registre
+	 */
+	void donarDeBaixa(String[][] registre) {
+		boolean trobat = false;
+		String dni = "";
+
+		String ficoBaixa = "";
+
+		System.out.print("Intro DNI per donar de Baixa; ");
+		dni = lector.nextLine();
+		
+		int posicio = obtenirFilaPerDniDonatBaixa(registre, dni);
+
+		if (posicio != REG_INEXISTENT) {
+			
+			System.out.println(" Aquest usuari ja esta donat de baixa;  " + registre[posicio][ID_USUARI]
+					+ " data baixa; " + registre[posicio][ID_DATA_BAIXA]);
+			System.out.println(" :::::::::::::::::::: ");
+			System.out.println(" ENTER PER CONTINUAR ");
+			System.out.println(" :::::::::::::::::::: ");
+			lector.nextLine();
+			return;
+		} else {
+			posicio = obtenirFilaPerDniUsuariActiu(registre, dni);
+		}
+
+		if (posicio == REG_INEXISTENT) {
+			System.out.println("No existeix");
+			lector.nextLine();
+			return;
+
+		}
+		if (posicio != REG_INEXISTENT && registre[posicio][ID_DATA_BAIXA]=="") {
+			System.out.println("_________________________________");
+			System.out.println(registre[posicio][ID_USUARI]);
+			System.out.println("Ultim dni registrat a la posicio " + posicio);
+			System.out.println("_________________________________");
+			System.out.println("Intro data baixa (00/00/0000)");
+			ficoBaixa = lector.nextLine();
+			registre[posicio][ID_DATA_BAIXA] = ficoBaixa;
+
+		}
+	}
+
+	/**
+	 * MÃ¨tode que mostra el registre
+	 *
+	 * @param registre
+	 */
+	void mostrarRegistre(String[][] registre) {
+		System.out.format("%-15s%-15s%-15s%-15s%n", "Usuari", "Dni", "Alta", "Baixa");
+		for (String[] dades : registre) {
+			System.out.format("%-15s%-15s%-15s%-15s%n", (Object[]) dades);
+		}
+
+	}
+
+	/**
+	 * MÃ¨tode que obtÃ¨ la fila dins de l'array un dni en actiu
+	 *
+	 * @param registre
+	 * @param dni
+	 * @return
+	 */
+	int obtenirFilaPerDniUsuariActiu(String[][] registre, String dni) {
+		boolean trobat = false;
+		int posicio = 0;
+		while (!trobat && posicio < registre.length) {
+			if (registre[posicio][ID_DNI].equals(dni) && registre[posicio][ID_DATA_BAIXA].equals("")) {
+				trobat = true;
+			} else {
+				posicio++;
+			}
+		}
+		if (trobat) {
+			return posicio;
+		} else {
+			return REG_INEXISTENT;
+		}
+	}
+
+	/**
+	 * MÃ¨tode que obtÃ¨ l'usuari d'una fila dins del registre
+	 *
+	 * @param registre
+	 * @param fila
+	 * @return
+	 */
+	String obtenirUsuariPerFila(String[][] registre, int fila) {
+		if (fila < 0 || fila >= registre.length) {
+			return "";
+		}
+		return registre[fila][ID_USUARI];
+	}
+
+	/**
+	 * MÃ¨tode que obtÃ¨ la fila dins de l'array un dni donat de baixa
+	 *
+	 * @param registre
+	 * @param dni
+	 * @return
+	 */
+
+	int obtenirFilaPerDniDonatBaixa(String[][] registre, String dni) {
+		boolean trobat = false;
+		int posicio = 0;
+		while (!trobat && posicio < registre.length) {
+			if (registre[posicio][ID_DNI].equals(dni) && registre[posicio][ID_DATA_BAIXA] != ("")) {
+				trobat = true;
+			} else {
+				posicio++;
+			}
+		}
+		if (trobat) {
+			return posicio;
+		} else {
+			return REG_INEXISTENT;
+		}
+	}
+
+}
